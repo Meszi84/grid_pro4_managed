@@ -1,7 +1,7 @@
 import requests
 import json
 
-WEBHOOK_URL = "https://discord.com/api/webhooks/1459260295439585400/yVZogHEZ2g2u7QRk9xRrtWj7PsYZqyuRlDRWBgyLzwSl_4XJzXdegUlLPXjE5qI5fNZh"
+WEBHOOK_URL = "YOUR_DISCORD_WEBHOOK_URL"
 
 def send_discord(
     title: str,
