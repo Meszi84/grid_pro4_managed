@@ -81,7 +81,132 @@ All logic is **explicit and deterministic** – no magic numbers hidden in the c
 
 ## 📦 Requirements
 
-Python **3.8+** required.
+- Python 3.11
+- Bybit Futures account
+- API key with trading permissions
 
+### Settings
+500+$
+```
+"risk": {
+  "risk_per_order_pct": 0.003,      // 0.3%
+  "grid_equity_ratio": 0.75
+},
+"grid": {
+  "order_count_cap": 24
+}
+```
+
+400$-500$
+```
+"risk": {
+  "risk_per_order_pct": 0.0025,     // 0.25%
+  "grid_equity_ratio": 0.7
+},
+"grid": {
+  "order_count_cap": 20
+}
+```
+
+300$-400$
+```
+"risk": {
+  "risk_per_order_pct": 0.002,      // 0.2%
+  "grid_equity_ratio": 0.65
+},
+"grid": {
+  "order_count_cap": 16
+}
+```
+
+250$ setting:
+```
+risk:
+  grid_equity_ratio: 0.6
+  risk_per_order_pct: 0.002
+
+grid:
+  order_count_cap: 10
+```
+
+150$ setting:
+```
+risk:
+  grid_equity_ratio: 0.55
+grid:
+  order_count_cap: 8
+risk:
+  risk_per_order_pct: 0.0015   # 0.15%
+```
+Minimum amount 80$
+```
+"risk": {
+  "risk_per_order_pct": 0.0015,   // 0.15%
+  "grid_equity_ratio": 0.5
+},
+"grid": {
+  "order_count_cap": 6
+}
+```
+---
+<img width="2217" height="951" alt="Képernyőkép 2026-02-09 190337" src="https://github.com/user-attachments/assets/493975ad-60bd-4ced-ae06-10239255528f" />
+
+## Requirements
+- Python 3.11
+- Bybit Futures account
+- API key with trading permissions
+
+### `.env.example` (commitolod)
+```env
+BYBIT_API_KEY=your_api_key_here
+BYBIT_API_SECRET=your_api_secret_here
+
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+
+ENV=production
+```
+## Start.sh
+```
+#!/bin/bash
+source .venv/bin/activate
+python grid_pro4_managed.py
+```
+## 2
+```
+chmod +x start.sh
+```
+## Restart.sh
+```
+#!/bin/bash
+pkill -f grid_pro4_managed.py
+sleep 2
+./start.sh
+```
+## Systemd
+```
+[Unit]
+Description=Grid Pro Trading Bot
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/grid_pro4_managed
+ExecStart=/root/grid_pro4_managed/start.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+## Activate
+```
+systemctl daemon-reload
+systemctl enable gridbot
+systemctl start gridbot
+```
+
+## Installation
 ```bash
-pip install ccxt pandas numpy
+git clone https://github.com/Meszi84/grid_pro4_managed.git
+cd grid_pro4_managed
+pip install -r requirements.txt
