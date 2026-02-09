@@ -1,5 +1,5 @@
 # =========================================
-# VERSION: grid_pro4_STABLE               =
+# VERSION: grid_pro4_managed  v4.2.0      =
 # STATUS: LOCKED (DO NOT EDIT ON MAINNET) =
 # DATE: 2026-01-29                        =
 # =========================================
