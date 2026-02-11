@@ -123,10 +123,10 @@ All logic is **explicit and deterministic** – no magic numbers hidden in the c
 ```
 risk:
   grid_equity_ratio: 0.6
-  risk_per_order_pct: 0.002
+  risk_per_order_pct: 0.003
 
 grid:
-  order_count_cap: 10
+  order_count_cap: 8
 ```
 
 150$ setting:
