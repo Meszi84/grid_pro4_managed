@@ -157,7 +157,7 @@ Minimum amount 80$
 - Bybit Futures account
 - API key with trading permissions
 
-### `.env.example` (commitolod)
+### `.env.example`
 ```env
 BYBIT_API_KEY=your_api_key_here
 BYBIT_API_SECRET=your_api_secret_here
