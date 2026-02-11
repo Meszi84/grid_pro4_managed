@@ -1,4 +1,4 @@
-![CI](https://github.com/Meszi84/grid_pro4_managed/blob/master/.github/workflows/python-app.yml)
+![CI](https://github.com/Meszi84/grid_pro4_managed/actions/workflows/python-app.yml/badge.svg)
 
 # Grid Pro 4 – Managed Trading Engine (Bybit / CCXT)
 
