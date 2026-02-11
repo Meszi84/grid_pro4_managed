@@ -5,7 +5,7 @@
 If you discover a security issue, do NOT open a public issue.
 
 Contact:
-your@email.com
+mgabor84@outlook.hu
 
 Include:
 - Description of vulnerability
