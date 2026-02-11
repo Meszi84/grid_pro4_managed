@@ -1,213 +1,98 @@
 # Grid Pro 4 – Managed Trading Engine (Bybit / CCXT)
 
-⚠️ **Advanced / Experimental trading engine**  
-This project is **not a beginner bot**. It is a **state-driven trading engine** designed to run safely on live exchanges with **minimal API usage**, **deterministic decisions**, and **clear separation between GRID and TREND regimes**.
+⚠️ Advanced / Experimental Trading Engine
 
-# Disclaimer: This software is for educational purposes only. Use it at your own risk. The author is not responsible for any financial losses.
----
+Grid Pro 4 is a state-driven trading engine designed for controlled live execution on Bybit Futures via CCXT.
 
-## 🔑 Key Principles
+This is not a beginner trading bot.
 
-- **One decision per cycle** (no order spam, no hidden loops)
-- **Explicit market state reconciliation on startup**
-- **GRID mode ≠ TREND mode** (never mixed)
-- **State machines instead of polling logic**
-- **API-throttled execution** (safe for CCXT rate limits)
-- **Fail-safe risk handling** (daily DD, liquidation safety, SL streak pause)
+The system is built around deterministic state machines, strict regime separation (GRID vs TREND), and explicit startup reconciliation to prevent unintended actions after restarts.
 
 ---
 
-## 🧠 Strategy Overview
+## Disclaimer
 
-### GRID Mode (Sideways Market)
-- Activated only when **ADX confirms range conditions**
-- Grid is **planned**, not instantly flooded
-- Orders are placed **gradually** (configurable)
-- Grid rebuild happens **only on structural changes**
-- No SL interference unless regime changes
+This software is provided for educational purposes only.
 
-### TREND Mode
-- Triggered by **ADX trend detection**
-- Grid orders are cancelled (LIMIT only, SL preserved)
-- If position exists:
-  - **Losing position → ATR-based Stop Loss (once)**
-  - **Winning position → ATR%-based trailing**
-- Position is allowed to **run naturally**
-- No re-entry until regime stabilizes
+Trading cryptocurrencies involves substantial risk.  
+Use at your own risk.  
+The author assumes no responsibility for financial losses.
 
 ---
 
-## 🚀 Startup Reconciliation (Critical Feature)
+# Core Design Principles
 
-On startup, the engine **does not trade immediately**.
-
-It first checks:
-- Existing positions
-- Active Stop Loss / conditional orders
-- Open grid orders
-- Current market regime (ADX)
-- Equity & risk limits
-
-Only **after a coherent market state is established** does the engine decide what to do next.
-
-This prevents:
-- Accidental SL deletion
-- Duplicate grid placement
-- Immediate unwanted closes after restart
-
----
-
-## 🛡 Risk Management
-
-- Daily drawdown stop (hard pause)
-- SL streak protection with cooldown
-- Liquidation proximity detection
-- Position-aware SL placement
+- One decision per cycle (no order spam)
+- Deterministic execution (no hidden loops)
+- Explicit startup reconciliation
+- GRID mode and TREND mode are strictly separated
+- API rate-limit safe (CCXT compatible)
+- Structured risk controls
 - No blind market orders
 
 ---
 
-## ⚙ Configuration
+# Strategy Overview
 
-Key configuration groups:
-- `exchange` – leverage, margin mode
-- `market` – symbol, timeframe, polling
-- `grid` – ATR logic, grid density, pacing
-- `risk` – equity limits, drawdown rules
-- `adx` – regime detection thresholds
+## GRID Mode (Sideways Regime)
 
-All logic is **explicit and deterministic** – no magic numbers hidden in the code.
+Activated only when ADX confirms range conditions.
+
+- Gradual grid placement (configurable pacing)
+- Grid rebuild only on structural change
+- No SL interference unless regime flips
+- Equity-aware order sizing
+
+## TREND Mode
+
+Activated when ADX detects directional momentum.
+
+- Grid LIMIT orders are cancelled (SL preserved)
+- Losing position → ATR-based stop loss (single placement)
+- Winning position → ATR-percentage trailing logic
+- No immediate re-entry after close
+- Position allowed to run naturally
 
 ---
 
-## 📦 Requirements
+# Startup Reconciliation (Critical Safety Feature)
 
-- Python 3.11
-- Bybit Futures account
-- API key with trading permissions
+On startup, the engine does not trade immediately.
 
-### Settings
-500+$
-```
-"risk": {
-  "risk_per_order_pct": 0.003,      // 0.3%
-  "grid_equity_ratio": 0.75
-},
-"grid": {
-  "order_count_cap": 24
-}
-```
+It validates:
 
-400$-500$
-```
-"risk": {
-  "risk_per_order_pct": 0.0025,     // 0.25%
-  "grid_equity_ratio": 0.7
-},
-"grid": {
-  "order_count_cap": 20
-}
-```
+- Existing open positions
+- Active stop-loss / conditional orders
+- Open grid orders
+- Current ADX regime
+- Equity state and risk thresholds
 
-300$-400$
-```
-"risk": {
-  "risk_per_order_pct": 0.002,      // 0.2%
-  "grid_equity_ratio": 0.65
-},
-"grid": {
-  "order_count_cap": 16
-}
-```
+Only after a coherent state is established does execution continue.
 
-250$ setting:
-```
-risk:
-  grid_equity_ratio: 0.6
-  risk_per_order_pct: 0.003
+This prevents:
 
-grid:
-  order_count_cap: 8
-```
+- Duplicate grid placement
+- Accidental SL removal
+- Immediate unwanted position closure after restart
 
-150$ setting:
-```
-risk:
-  grid_equity_ratio: 0.55
-grid:
-  order_count_cap: 8
-risk:
-  risk_per_order_pct: 0.0015   # 0.15%
-```
-Minimum amount 80$
-```
-"risk": {
-  "risk_per_order_pct": 0.0015,   // 0.15%
-  "grid_equity_ratio": 0.5
-},
-"grid": {
-  "order_count_cap": 6
-}
-```
 ---
-<img width="2217" height="951" alt="Képernyőkép 2026-02-09 190337" src="https://github.com/user-attachments/assets/493975ad-60bd-4ced-ae06-10239255528f" />
 
-## Requirements
+# Requirements
+
 - Python 3.11
-- Bybit Futures account
+- Bybit USDT Perpetual account
 - API key with trading permissions
+- Minimum recommended equity: 80 USD
 
-### `.env.example`
-```env
-BYBIT_API_KEY=your_api_key_here
-BYBIT_API_SECRET=your_api_secret_here
+---
 
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+# Installation
 
-ENV=production
-```
-## Start.sh
-```
-#!/bin/bash
-source .venv/bin/activate
-python grid_pro4_managed.py
-```
-## 2
-```
-chmod +x start.sh
-```
-## Restart.sh
-```
-#!/bin/bash
-pkill -f grid_pro4_managed.py
-sleep 2
-./start.sh
-```
-## Systemd
-```
-[Unit]
-Description=Grid Pro Trading Bot
-After=network.target
-
-[Service]
-User=root
-WorkingDirectory=/root/grid_pro4_managed
-ExecStart=/root/grid_pro4_managed/start.sh
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-```
-## Activate
-```
-systemctl daemon-reload
-systemctl enable gridbot
-systemctl start gridbot
-```
-
-## Installation
 ```bash
 git clone https://github.com/Meszi84/grid_pro4_managed.git
 cd grid_pro4_managed
+
+python3 -m venv .venv
+source .venv/bin/activate
+
 pip install -r requirements.txt
