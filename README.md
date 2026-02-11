@@ -96,3 +96,209 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 pip install -r requirements.txt
+````
+
+---
+
+# Environment Configuration
+
+Create a `.env` file based on the example below:
+
+## `.env.example`
+
+```env
+BYBIT_API_KEY=your_api_key_here
+BYBIT_API_SECRET=your_api_secret_here
+
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+
+ENV=production
+```
+
+---
+
+# Running the Engine
+
+```bash
+cp .env.example .env
+python grid_pro4_managed.py
+```
+
+---
+
+# Risk Configuration Profiles
+
+Below are example risk presets.
+Adjust according to your equity and risk tolerance.
+
+---
+
+## 500 USD+
+
+```json
+"risk": {
+  "risk_per_order_pct": 0.003,
+  "grid_equity_ratio": 0.75
+},
+"grid": {
+  "order_count_cap": 24
+}
+```
+
+---
+
+## 400–500 USD
+
+```json
+"risk": {
+  "risk_per_order_pct": 0.0025,
+  "grid_equity_ratio": 0.7
+},
+"grid": {
+  "order_count_cap": 20
+}
+```
+
+---
+
+## 300–400 USD
+
+```json
+"risk": {
+  "risk_per_order_pct": 0.002,
+  "grid_equity_ratio": 0.65
+},
+"grid": {
+  "order_count_cap": 16
+}
+```
+
+---
+
+## 250 USD
+
+```yaml
+risk:
+  grid_equity_ratio: 0.6
+  risk_per_order_pct: 0.003
+
+grid:
+  order_count_cap: 8
+```
+
+---
+
+## 150 USD
+
+```yaml
+risk:
+  grid_equity_ratio: 0.55
+  risk_per_order_pct: 0.0015
+
+grid:
+  order_count_cap: 8
+```
+
+---
+
+## Minimum (80 USD)
+
+```json
+"risk": {
+  "risk_per_order_pct": 0.0015,
+  "grid_equity_ratio": 0.5
+},
+"grid": {
+  "order_count_cap": 6
+}
+```
+
+---
+
+# Optional Process Management
+
+## start.sh
+
+```bash
+#!/bin/bash
+source .venv/bin/activate
+python grid_pro4_managed.py
+```
+
+Make executable:
+
+```bash
+chmod +x start.sh
+```
+
+---
+
+## restart.sh
+
+```bash
+#!/bin/bash
+pkill -f grid_pro4_managed.py
+sleep 2
+./start.sh
+```
+
+---
+
+## Systemd Service Example
+
+```
+[Unit]
+Description=Grid Pro Trading Bot
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/grid_pro4_managed
+ExecStart=/root/grid_pro4_managed/start.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable service:
+
+```bash
+systemctl daemon-reload
+systemctl enable gridbot
+systemctl start gridbot
+```
+
+---
+
+# Architecture Notes
+
+* State-machine driven decision engine
+* Regime-aware execution (GRID vs TREND)
+* Explicit reconciliation logic
+* No implicit retries
+* CCXT rate-limit aware
+* Deterministic behavior
+
+---
+
+# License
+
+MIT License
+
+```
+
+---
+
+Most már:
+
+- Nincs duplikáció  
+- Nincs törött markdown  
+- Nincs félbehagyott blokk  
+- Konzisztens struktúra  
+- Szakmailag vállalható  
+
+Ha következő szintre akarod emelni a projektet, akkor a következő lépés:  
+requirements.txt verzió rögzítés + CHANGELOG + v0.1.0 release tag.
+```
