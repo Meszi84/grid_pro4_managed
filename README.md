@@ -3,6 +3,7 @@
 ⚠️ **Advanced / Experimental trading engine**  
 This project is **not a beginner bot**. It is a **state-driven trading engine** designed to run safely on live exchanges with **minimal API usage**, **deterministic decisions**, and **clear separation between GRID and TREND regimes**.
 
+# Disclaimer: This software is for educational purposes only. Use it at your own risk. The author is not responsible for any financial losses.
 ---
 
 ## 🔑 Key Principles
