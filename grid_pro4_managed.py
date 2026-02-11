@@ -1138,6 +1138,8 @@ def ensure_grid_orders(
     budget_left = max_new_orders if (max_new_orders is not None and max_new_orders > 0) else None
 
     # 6) Kihelyezés: előbb BUY, majd SELL (szándékosan determinisztikus)
+    market = ex.market(symbol)
+
     for side, plist, open_set in (("buy", buys, buy_open), ("sell", sells, sell_open)):
         for price in plist:
             if budget_left is not None and placed >= budget_left:
@@ -1147,28 +1149,45 @@ def ensure_grid_orders(
                 continue
 
             try:
-                # Risk sizing (egyszerű, konzervatív): qty = risk_usdt / (atr * price)
-                qty = risk_usdt / (atr * price)
-                amt = float(ex.amount_to_precision(symbol, qty))
+                qty_raw = risk_usdt / (atr * price)
+
+                try:
+                   amt = float(ex.amount_to_precision(symbol, qty_raw))
+                except Exception:
+                    continue
+
+                precision_amt = float(market["precision"]["amount"] or 0.0)
+                if amt <= 0 or amt < precision_amt:
+                    continue
+
                 if min_amt and amt < float(min_amt):
                     continue
 
                 notional = amt * price
                 if notional < min_notional:
-                    continue
+                   continue
 
                 logger.info(
                     "Grid order: %s %s %s @ %.6f | atr=%.6f | notional=%.2f",
-                    side.upper(), amt, symbol, price, atr, notional
+                    side.upper(),
+                    amt,
+                    symbol,
+                    price,
+                    atr,
+                    notional,
                 )
 
-                place_limit(ex, symbol, side, price, amt, bool(cfg["grid"]["post_only"]))
+                place_limit(
+                    ex, symbol, side, price, amt, bool(cfg["grid"]["post_only"])
+                )
 
                 placed += 1
                 open_set.add(price)
 
             except Exception:
-                logger.exception("Hiba a grid order elhelyezésekor (%s @ %s).", side, price)
+                logger.exception(
+                    "Hiba a grid order elhelyezésekor (%s @ %s).", side, price
+                )
 
     return placed
 
